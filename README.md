@@ -1,3 +1,4 @@
 # REXX
 
-1.REXX Program to recall all versions of GDG BASE
+1.HRECAL - REXX Program to recall all migrated versions of GDG BASE
+2.REMCOM - REXX ISREDIT macro to remove comment,eject lines from a cobol program
