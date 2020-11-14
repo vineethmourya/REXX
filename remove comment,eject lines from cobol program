@@ -1,0 +1,8 @@
+/*REXX TO REMOVE ALL COMMENT,EJECT LINES IN A COBOL PROGRAM*/           
+ADDRESS ISPEXEC 'CONTROL ERRORS RETURN'                                 
+ADDRESS ISREDIT 'MACRO PROCESS'                                         
+"ISREDIT X ALL '*' 7 7"                                                 
+'ISREDIT DELETE ALL X'                                                  
+"ISREDIT X ALL '/' 7 7"                                                 
+'ISREDIT DELETE ALL X'                                                  
+EXIT                                                                    
