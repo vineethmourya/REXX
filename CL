@@ -1,0 +1,6 @@
+/*REXX TO REMOVE ALL EXPANDED COPYBOOK,DCLGEN LINES USING XP*/ 
+ADDRESS ISPEXEC 'CONTROL ERRORS RETURN'                        
+ADDRESS ISREDIT 'MACRO PROCESS'                                
+"ISREDIT X ALL '(^__^)' 1 6"                                   
+'ISREDIT DELETE ALL X'                                         
+EXIT                                                           
