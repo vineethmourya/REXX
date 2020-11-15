@@ -1,0 +1,72 @@
+/* REX SEARCH PROGRAM */                
+VJOB=0                                  
+VPRC=0                                  
+VCTL=0                                  
+VCOB=0                                  
+VCPY=0                                  
+VDCL=0                                  
+VOPT=0                                  
+PDS.1=CD.NE.TSOU.PRODJCL                
+PDS.2=P.PROCLIB                         
+PDS.3=P.CTLCARDS                        
+PDS.4=SW.ENDV.SYU.PROD.FEPD.COB         
+PDS.5=SW.ENDV.SYU.PROD.FEPD.CPY         
+PDS.6=SW.ENDV.SYU.PROD.FEPD.DCL         
+PDS.7=SW.ENDV.SYU.PROD.FEPD.OPT         
+                                        
+PARSE ARG MEMBER                        
+                                        
+DO I = 1 TO 7 BY 1                      
+   CHECK='NOT OK'                       
+   FINAL=PDS.I'('||MEMBER||')'          
+   CHECK=SYSDSN("'"FINAL"'")            
+   IF I=1 & CHECK='OK' THEN DO          
+      VJOB=1                            
+      SAY 'PRESS 1 FOR JOB'             
+   END                                  
+   IF I=2 & CHECK='OK' THEN DO          
+      VPRC=1                            
+      SAY 'PRESS 2 FOR PRC'             
+   END                                  
+   IF I=3 & CHECK='OK' THEN DO          
+      VCTL=1                            
+      SAY 'PRESS 3 FOR CTL'             
+   END                                  
+      IF I=4 & CHECK='OK' THEN DO                  
+      VCOB=1                                    
+      SAY 'PRESS 4 FOR COB'                     
+   END                                          
+   IF I=5 & CHECK='OK' THEN DO                  
+      VCPY=1                                    
+      SAY 'PRESS 5 FOR CPY'                     
+   END                                          
+   IF I=6 & CHECK='OK' THEN DO                  
+      VDCL=1                                    
+      SAY 'PRESS 6 FOR DCL'                     
+   END                                          
+   IF I=7 & CHECK='OK' THEN DO                  
+      VOPT=1                                    
+      SAY 'PRESS 7 FOR OPT'                     
+   END                                          
+END                                             
+                                                
+IF VJOB == 0 &,                                 
+   VPRC == 0 &,                                 
+   VCTL == 0 &,                                 
+   VCOB == 0 &,                                 
+   VCPY == 0 &,                                 
+   VDCL == 0 &,                                 
+   VOPT == 0 THEN                               
+   SAY "ELEMENT NOT FOUND"                      
+ELSE DO                                         
+   SAY "ENTER YOUR CHOICE : "                   
+   PULL USERINP                                 
+   IF USERINP < 1 | USERINP > 7 THEN            
+      SAY "INVALID CHOICE"                      
+   ELSE DO                                      
+      FINAL=PDS.USERINP'('||MEMBER||')'         
+      ISPEXEC "VIEW DATASET('"FINAL"')"         
+   END                                          
+   END                                          
+              
+EXIT       
