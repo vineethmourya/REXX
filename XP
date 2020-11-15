@@ -1,0 +1,63 @@
+FOUND=0;EXPANDED=0;I=1                                           
+ADDRESS ISPEXEC 'CONTROL ERRORS RETURN'                          
+ADDRESS ISREDIT 'MACRO PROCESS'                                  
+'ISREDIT (LASTLINE) = LINENUM .ZLAST'                            
+DO FOREVER                                                       
+    IF I <= LASTLINE THEN DO                                     
+         'ISREDIT (PLINE) = LINE ' I                             
+         P2LINE = STRIP(PLINE,T)                                 
+         CHECK = SUBSTR(P2LINE,7,65)                             
+         COL7 = SUBSTR(CHECK,1,1)                                
+         IF (COL7 <> '*') THEN DO                                
+              COPY = SUBWORD(CHECK,1,1)                          
+              CBK = SUBWORD(CHECK,2,1)                           
+              UCOPY = TRANSLATE(COPY)                            
+              IF (UCOPY = 'COPY' | UCOPY = 'INCLUDE') THEN DO    
+                   FOUND = FOUND + 1                             
+                   SCBK = STRIP(CBK,'T',.)                       
+                   CALL GET_CPYBK_RECORDS                        
+              END                                                
+         END                                                     
+         I=I+1                                                   
+    END                                                          
+    ELSE DO                                                      
+         ZEDLMSG = 'FOUND = ' FOUND 'EXPANDED = 'EXPANDED        
+         "ISPEXEC SETMSG MSG(ISRZ000)"                           
+         EXIT                                                    
+    END                                                          
+END                                                              
+/*------------------------------------------------------------*/       
+GET_CPYBK_RECORDS:                                                     
+    LIB.1="SW.ENDV.SYU.PROD.FEPD.CPY"                                  
+    LIB.2="SW.ENDV.SYU.PROD.FEPD.DCL"                                  
+    LIB.3="TE.PD.GAPS.COPYLIB"                                         
+    LIB.4="ER.DP.LMS.COPYLIB"                                          
+    LIB.5="SW.ENDV.SYU.PROD.FERG.CPY"                                  
+    LIB.6="SW.ENDV.SYU.PROD.FERG.DCL"                                  
+                                                                       
+    DO K = 1 TO 6 BY 1                                                 
+         DS = LIB.K||'('||SCBK||')'                                    
+         DSDSN = SYSDSN("'"DS"'")                                      
+         IF (DSDSN = 'OK') THEN DO                                     
+              "ALLOC DD(INFILE) DSNAME('"DS"') SHR REUSE"              
+              "EXECIO * DISKR INFILE(STEM COPYREC. FINIS"              
+              "FREE DD(INFILE)"                                        
+              CALL INSERT_COPYBOOK                                     
+              K = 7                                                    
+         END                                                           
+    END                                                                
+    RETURN                                                             
+/*------------------------------------------------------------*/       
+INSERT_COPYBOOK:                                                       
+    TEMP=I        /* GETS CURRENT LINE(I) FOR ASC INSERT BY ITERATING*/
+    DO J = 1 TO COPYREC.0 BY 1                                         
+         SCOPYREC.J = STRIP(COPYREC.J,'T')                             
+         SYM = '(^__^)'                                                
+         DATA = OVERLAY(SYM,SCOPYREC.J)                                
+         "ISREDIT LINE_AFTER "TEMP" = DATALINE "'"'DATA'"'             
+         TEMP=TEMP+1                                                   
+         IF J = COPYREC.0 THEN                                         
+              LASTLINE = LASTLINE + COPYREC.0                          
+    END                                                                
+    EXPANDED = EXPANDED + 1                                            
+    RETURN                                                             
