@@ -1,6 +1,8 @@
 # REXX Programs
+
 --------------------------------------------------------------------------
 Initial command - TSO ISRDDN
+
 Initial rexx - Allocate rexx pds to system pds.
 --------------------------------------------------------------------------
 1.  HRECAL       - RECALL ALL MIGRATED VERSIONS OF GDG                 
