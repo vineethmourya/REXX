@@ -1,0 +1,46 @@
+/* REXX */                                                              00010000
+ADDRESS ISPEXEC 'CONTROL ERRORS RETURN'                                 00020000
+ADDRESS ISREDIT 'MACRO PROCESS'                                         00030000
+/*--------------------------------------------------------------------*/00040001
+/*1.LIST MEMBERS OF A PDS IN A DATASET THRU REXX----------------------*/00084101
+/*--------------------------------------------------------------------*/00084201
+/*1.1 GET THE MEMBERS LIST AND STORE IN STEM VARIABLE-----------------*/00084301
+/*L1='IF110X3.A.CPY'*/                                                  00086101
+FIL1='SW.ENDV.SYC.PROD.PAMM.COB'                                        00086201
+X=OUTTRAP("RES.")                                                       00087001
+ADDRESS TSO "LISTDS ('"FIL1"') MEMBERS"                                 00088001
+X=OUTTRAP("OFF")                                                        00089001
+       J=1                                                              00089101
+       DO I = 7 TO RES.0                                                00089201
+         RES.I = STRIP(RES.I)                                           00089301
+         DS = FIL1 ³³ "(" ³³ RES.I ³³ ")"                               00089501
+         WRITE1.J = DS                                                  00089701
+         J=J+1                                                          00090001
+       END                                                              00090101
+/*1.2 PREDELETE-------------------------------------------------------*/00090201
+"DELETE 'IF110X3.A.REXX.WORK.DATASET'"                                  00090301
+/*1.3 CREATE DATASET AND WRITE RESULT STORED IN STEM VARIABLE---------*/00090401
+"ALLOCATE DDNAME(WD1) DSNAME('IF110X3.A.REXX.WORK.DATASET')",           00090501
+"MOD REUSE SPACE(20,2) BLKSIZE(800) LRECL(80) RECFM(F,B)"               00090601
+                                                                        00090701
+"EXECIO * DISKW WD1 (STEM WRITE1. FINIS"                                00091001
+/*--------------------------------------------------------------------*/00091101
+/*2. GET LINE COUNTS FROM EACH PDS MEMBER STORED IN ABOVE FILE--------*/00091201
+/*--------------------------------------------------------------------*/00091301
+"EXECIO * DISKR WD1 (STEM PR1. FINIS)"                                  00092001
+SAY PR1.0                                                               00093001
+       DO I = 1 TO PR1.0                                                00094001
+         PR1.I = STRIP(PR1.I)                                           00095001
+         "ALLOCATE DDNAME(SR2) DSNAME('"PR1.I"') SHR REUSE"             00095101
+         "EXECIO * DISKR SR2 (STEM LIN1. FINIS)"                        00095401
+         FINAL1.I = LIN1.0                                              00095501
+         FINALW.I = PR1.I ³³ '-' ³³ FINAL1.I                            00095601
+       END                                                              00099001
+"DELETE 'IF110X3.A.REXX.WORK.DATASET1'"                                 00099101
+                                                                        00099201
+"ALLOCATE DDNAME(WD2) DSNAME('IF110X3.A.REXX.WORK.DATASET1')",          00099301
+"MOD REUSE SPACE(20,2) BLKSIZE(800) LRECL(80) RECFM(F,B)"               00099401
+                                                                        00099501
+"EXECIO * DISKW WD2 (STEM FINALW. FINIS"                                00099601
+EXIT                                                                    00100000
+
